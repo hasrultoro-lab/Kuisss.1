@@ -1,0 +1,60 @@
+
+function finish(timedOut = false) {
+  if (finished) return;
+
+  finished = true;
+  clearInterval(timerInterval);
+  show("done");
+
+  $("finishname").textContent = timedOut
+    ? `Waktu 8 menit habis, ${studentName}. Jawaban dikumpulkan otomatis.`
+    : `Hebat, ${studentName}! Kuis selesai.`;
+
+  let correct = 0;
+  let wrong = 0;
+  let blank = 0;
+
+  $("review").innerHTML = order.map((idx, i) => {
+    const q = QUESTIONS[idx];
+    const a = answers[i];
+    const ok = a === q.answer;
+
+    if (a === null) {
+      blank++;
+    } else if (ok) {
+      correct++;
+    } else {
+      wrong++;
+    }
+
+    return `
+      <div class="review">
+        <strong>${i + 1}. ${esc(q.q)}</strong>
+        <p>
+          Jawaban siswa:
+          ${a === null ? "Belum dijawab" : esc(q.opts[a])}
+        </p>
+        <p>${ok ? "✓ Benar" : "✕ Salah"}</p>
+        <p>
+          Jawaban benar: ${esc(q.opts[q.answer])}
+        </p>
+      </div>
+    `;
+  }).join("");
+
+  // Setiap jawaban benar bernilai 5 poin
+  const finalScore = correct * 5;
+
+  $("score").textContent = finalScore + "/100";
+
+  $("breakdown").textContent =
+    `${correct} benar • ${wrong} salah • ${blank} kosong`;
+
+  $("feedback").textContent =
+    finalScore === 100 ? "Excellent! 🌟" :
+    finalScore >= 75 ? "Great Job! 🎉" :
+    finalScore >= 50 ? "Good Effort! 💪" :
+    "Keep Practicing! 📚";
+
+  window.scrollTo(0, 0);
+}
